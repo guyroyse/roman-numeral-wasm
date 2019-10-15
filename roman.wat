@@ -110,7 +110,7 @@
         ;; exit loop if we're less than value
         (br_if 1 (i32.lt_u (local.get $current) (local.get $value)))
 
-        ;; copy byte with the numeral
+        ;; copy string with the numeral
         (call $append_string (local.get $numeral) (local.get $to))
 
         ;; reduce the balance by the current number
@@ -125,9 +125,31 @@
   )
 
   (func $append_string (param $from i32) (param $to i32)
-    (call $copy_byte 
-      (local.get $from)
-      (call $find_null (local.get $to))
+    (local $from_index i32)
+    (local $to_index i32)
+
+    (local.set $from_index (local.get $from))
+    (local.set $to_index (call $find_null (local.get $to)))
+
+    (block
+      (loop
+
+        ;; exit loop if we're out of bytes
+        (br_if 1 (i32.eqz (i32.load8_u (local.get $from_index))))
+
+        ;; copy a byte
+        (call $copy_byte 
+          (local.get $from_index)
+          (local.get $to_index)
+        )
+
+        ;; increment the indeces
+        (local.set $from_index (call $inc (local.get $from_index)))
+        (local.set $to_index (call $inc (local.get $to_index)))
+
+        ;; loop again
+        (br 0)
+      )
     )
   )
 
@@ -136,9 +158,14 @@
 
     (local.set $address (local.get $s))
     (block 
-      (loop 
-        (br_if 1 (i32.eqz (i32.load (local.get $address))))
+      (loop
+        ;; is it null yet
+        (br_if 1 (i32.eqz (i32.load8_u (local.get $address))))
+
+        ;; nope, next
         (local.set $address (call $inc (local.get $address)))
+
+        ;; loop again
         (br 0)
       )
     )
@@ -149,7 +176,7 @@
   (func $copy_byte (param $from i32) (param $to i32)
     (i32.store8
       (local.get $to)
-      (i32.load (local.get $from))
+      (i32.load8_u (local.get $from))
     )
   )
 

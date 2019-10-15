@@ -28,7 +28,7 @@ describe("Roman Numerals", () => {
     { arabic: 200, roman: "CC" },
     { arabic: 300, roman: "CCC" },
     { arabic: 388, roman: "CCCLXXXVIII" },
-    { arabic: 400, roman: "XD" },
+    { arabic: 400, roman: "CD" },
     { arabic: 500, roman: "D" },
     { arabic: 888, roman: "DCCCLXXXVIII" },
     { arabic: 900, roman: "CM" },
