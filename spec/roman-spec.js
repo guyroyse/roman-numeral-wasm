@@ -49,4 +49,21 @@ describe("Roman Numerals", () => {
   
   })
 
+  it("terminates strings with a NULL", () => {
+    let psz
+    
+    psz = this.subject.romanize(8)
+    let eight = decodeString(this.subject.memory, psz)
+
+    psz = this.subject.romanize(20)
+    let twenty = decodeString(this.subject.memory, psz)
+
+    psz = this.subject.romanize(0)
+    let zero = decodeString(this.subject.memory, psz)
+    
+    expect(eight).toBe("VIII")
+    expect(twenty).toBe("XX")
+    expect(zero).toBe("")
+  })
+
 })

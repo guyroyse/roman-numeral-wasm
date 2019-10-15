@@ -25,6 +25,7 @@
 
     ;; shove our string at position 1024
     (local.set $roman (i32.const 1024))
+    (call $null_string (local.get $roman))
 
     ;; initialize the current number
     (local.set $balance (local.get $num))
@@ -124,6 +125,10 @@
     (return (local.get $current))
   )
 
+  (func $null_string (param $at i32)
+    (i32.store8 (local.get $at) (i32.const 0))
+  )
+
   (func $append_string (param $from i32) (param $to i32)
     (local $from_index i32)
     (local $to_index i32)
@@ -151,6 +156,9 @@
         (br 0)
       )
     )
+
+    (i32.store8 (local.get $to_index) (i32.const 0))
+
   )
 
   (func $find_null (param $s i32) (result i32)
