@@ -2,6 +2,22 @@
 
   (memory $memory 1)
 
+  (global $roman i32 (i32.const 1024))
+
+  (global $i i32  (i32.const 0))
+  (global $iv i32 (i32.const 2))
+  (global $v i32  (i32.const 5))
+  (global $ix i32 (i32.const 7))
+  (global $x i32  (i32.const 10))
+  (global $xl i32 (i32.const 12))
+  (global $l i32  (i32.const 15))
+  (global $xc i32 (i32.const 17))
+  (global $c i32  (i32.const 20))
+  (global $cd i32 (i32.const 22))
+  (global $d i32  (i32.const 25))
+  (global $cm i32 (i32.const 27))
+  (global $m i32  (i32.const 30))
+
   (data (i32.const 0) "I\00")
   (data (i32.const 2) "IV\00")
   (data (i32.const 5) "V\00")
@@ -20,109 +36,94 @@
   (export "romanize" (func $romanize))
 
   (func $romanize (param $num i32) (result i32)
-    (local $roman i32)
     (local $balance i32)
 
-    ;; shove our string at position 1024
-    (local.set $roman (i32.const 1024))
-    (call $null_string (local.get $roman))
+    ;; null out starting string
+    (call $null_string (global.get $roman))
 
     ;; initialize the current number
     (local.set $balance (local.get $num))
 
     ;; remove all the Ms
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 1000) (i32.const 30) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 1000) (global.get $m)))
 
     ;; remove all the CMs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 900) (i32.const 27) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 900) (global.get $cm)))
 
     ;; remove all the Ds
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 500) (i32.const 25) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 500) (global.get $d)))
 
     ;; remove all the CDs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 400) (i32.const 22) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 400) (global.get $cd)))
 
     ;; remove all the Cs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 100) (i32.const 20) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 100) (global.get $c)))
 
     ;; remove all the XCs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 90) (i32.const 17) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 90) (global.get $xc)))
 
     ;; remove all the Ls
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 50) (i32.const 15) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 50) (global.get $l)))
 
     ;; remove all the XLs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 40) (i32.const 12) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 40) (global.get $xl)))
 
     ;; remove all the Xs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 10) (i32.const 10) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 10) (global.get $x)))
 
     ;; remove all the IXs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 9) (i32.const 7) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 9) (global.get $ix)))
 
     ;; remove all the Vs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 5) (i32.const 5) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 5) (global.get $v)))
 
     ;; remove all the IVs
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 4) (i32.const 2) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 4) (global.get $iv)))
 
     ;; remove all the Is
     (local.set $balance 
-      (call $remove_and_build
-        (local.get $balance) (i32.const 1) (i32.const 0) (local.get $roman)))
+      (call $remove_and_build (local.get $balance) (i32.const 1) (global.get $i)))
 
-    (return (local.get $roman))
+    (return (global.get $roman))
   )
 
   (func $remove_and_build 
-    (param $balance i32) (param $value i32) (param $numeral i32)
-    (param $to i32) (result i32)
-    (local $current i32)
+    (param $balance i32) (param $value i32) (param $numeral i32) (result i32)
+    (local $current_balance i32)
 
-    (local.set $current (local.get $balance))
+    (local.set $current_balance (local.get $balance))
 
     (block 
       (loop 
 
         ;; exit loop if we're less than value
-        (br_if 1 (i32.lt_u (local.get $current) (local.get $value)))
+        (br_if 1 (i32.lt_u (local.get $current_balance) (local.get $value)))
 
         ;; copy string with the numeral
-        (call $append_string (local.get $numeral) (local.get $to))
+        (call $append_string (local.get $numeral) (global.get $roman))
 
         ;; reduce the balance by the current number
-        (local.set $current (i32.sub (local.get $current) (local.get $value)))
+        (local.set $current_balance 
+          (i32.sub (local.get $current_balance) (local.get $value)))
 
         ;; loop again
         (br 0)
       )
     )
 
-    (return (local.get $current))
+    (return (local.get $current_balance))
   )
 
   (func $null_string (param $at i32)

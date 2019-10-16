@@ -1,5 +1,5 @@
 async function loadWasm(path, imports) {
-  let response = await fetch(path)
+  let response = await fetch(`${path}?busted=${Math.random()}`)
   let bytes = await response.arrayBuffer()
   let module = await WebAssembly.instantiate(bytes, imports)
   return module.instance.exports
