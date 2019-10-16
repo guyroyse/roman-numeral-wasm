@@ -18,6 +18,8 @@
   (global $cm i32 (i32.const 27))
   (global $m i32  (i32.const 30))
 
+  (global $null i32 (i32.const 0))
+
   (data (i32.const 0) "I\00")
   (data (i32.const 2) "IV\00")
   (data (i32.const 5) "V\00")
@@ -127,7 +129,7 @@
   )
 
   (func $null_string (param $at i32)
-    (i32.store8 (local.get $at) (i32.const 0))
+    (i32.store8 (local.get $at) (global.get $null))
   )
 
   (func $append_string (param $from i32) (param $to i32)
@@ -158,7 +160,8 @@
       )
     )
 
-    (i32.store8 (local.get $to_index) (i32.const 0))
+    ;; append null
+    (i32.store8 (local.get $to_index) (global.get $null))
 
   )
 
